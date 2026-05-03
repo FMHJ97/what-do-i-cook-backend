@@ -18,7 +18,7 @@ public class Recipe {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
+    @JoinColumn(name = "user_id", nullable = false, foreignKey = @ForeignKey(name = "fk_recipe_user"))
     private User owner;
 
     @Column(nullable = false, length = 100)

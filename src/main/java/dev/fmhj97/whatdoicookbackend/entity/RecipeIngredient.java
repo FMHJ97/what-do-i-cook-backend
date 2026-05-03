@@ -13,11 +13,11 @@ public class RecipeIngredient {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "recipe_id", nullable = false)
+    @JoinColumn(name = "recipe_id", nullable = false, foreignKey = @ForeignKey(name = "fk_recipe_ingredient_recipe"))
     private Recipe recipe;
 
     @ManyToOne
-    @JoinColumn(name = "ingredient_id", nullable = false)
+    @JoinColumn(name = "ingredient_id", nullable = false, foreignKey = @ForeignKey(name = "fk_recipe_ingredient_ingredient"))
     private Ingredient ingredient;
 
     @Column(length = 10)
