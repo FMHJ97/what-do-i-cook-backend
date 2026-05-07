@@ -59,7 +59,7 @@ public class JwtService {
     }
 
     /**
-     * Extracts the username (email) from the given JWT token.
+     * Extracts the username from the given JWT token.
      * @param token JWT token.
      * @return Username stored in the JWT token.
      */

@@ -19,7 +19,7 @@ public class User implements UserDetails {
     private Long id;
 
     @Column(nullable = false, unique = true, length = 50)
-    private String nickname;
+    private String username;
 
     @Column(nullable = false, unique = true, length = 100)
     private String email;
@@ -50,13 +50,13 @@ public class User implements UserDetails {
 
     /**
      * Constructor with args
-     * @param nickname
+     * @param username
      * @param email
      * @param password
      * @param role
      */
-    public User(String nickname, String email, String password, Role role) {
-        this.nickname = nickname;
+    public User(String username, String email, String password, Role role) {
+        this.username = username;
         this.email = email;
         this.password = password;
         this.role = role;
@@ -109,20 +109,12 @@ public class User implements UserDetails {
         return id;
     }
 
-    /**
-     * Returns the email used as the principal identifier for Spring Security.
-     * @return User's email.
-     */
     public String getUsername() {
-        return email;
+        return username;
     }
 
-    public String getNickname() {
-        return nickname;
-    }
-
-    public void setNickname(String nickname) {
-        this.nickname = nickname;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getEmail() {
