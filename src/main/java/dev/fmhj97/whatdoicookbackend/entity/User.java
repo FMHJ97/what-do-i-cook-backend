@@ -19,7 +19,7 @@ public class User implements UserDetails {
     private Long id;
 
     @Column(nullable = false, unique = true, length = 50)
-    private String username;
+    private String nickname;
 
     @Column(nullable = false, unique = true, length = 100)
     private String email;
@@ -50,13 +50,13 @@ public class User implements UserDetails {
 
     /**
      * Constructor with args
-     * @param username
+     * @param nickname
      * @param email
      * @param password
      * @param role
      */
-    public User(String username, String email, String password, Role role) {
-        this.username = username;
+    public User(String nickname, String email, String password, Role role) {
+        this.nickname = nickname;
         this.email = email;
         this.password = password;
         this.role = role;
@@ -85,22 +85,22 @@ public class User implements UserDetails {
 
     @Override
     public boolean isAccountNonExpired() {
-        return UserDetails.super.isAccountNonExpired();
+        return true;
     }
 
     @Override
     public boolean isAccountNonLocked() {
-        return UserDetails.super.isAccountNonLocked();
+        return true;
     }
 
     @Override
     public boolean isCredentialsNonExpired() {
-        return UserDetails.super.isCredentialsNonExpired();
+        return true;
     }
 
     @Override
     public boolean isEnabled() {
-        return UserDetails.super.isEnabled();
+        return true;
     }
 
     // Getters & Setters
@@ -109,12 +109,20 @@ public class User implements UserDetails {
         return id;
     }
 
+    /**
+     * Returns the email used as the principal identifier for Spring Security.
+     * @return User's email.
+     */
     public String getUsername() {
-        return username;
+        return email;
     }
 
-    public void setUsername(String username) {
-        this.username = username;
+    public String getNickname() {
+        return nickname;
+    }
+
+    public void setNickname(String nickname) {
+        this.nickname = nickname;
     }
 
     public String getEmail() {
