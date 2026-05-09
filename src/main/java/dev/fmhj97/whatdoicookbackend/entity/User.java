@@ -103,6 +103,15 @@ public class User implements UserDetails {
         return true;
     }
 
+    // Custom Methods
+
+    /**
+     * Update the lastLoginAt field.
+     */
+    public void updateLastLoginAt() {
+        this.lastLoginAt = LocalDateTime.now();
+    }
+
     // Getters & Setters
 
     public Long getId() {

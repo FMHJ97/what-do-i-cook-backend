@@ -61,7 +61,11 @@ public class AuthService {
         );
 
         // Load the user from the database.
-        UserDetails currentUser = userDetailsService.loadUserByUsername(dto.username());
+        User currentUser = (User) userDetailsService.loadUserByUsername(dto.username());
+
+        // Update and save the lastLoginAt field.
+        currentUser.updateLastLoginAt();
+        userRepository.save(currentUser);
 
         // Generate and return the JWT token.
         String jwtToken = jwtService.generateJwtToken(currentUser);
