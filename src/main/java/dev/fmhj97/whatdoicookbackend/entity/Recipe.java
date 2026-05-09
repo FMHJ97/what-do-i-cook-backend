@@ -34,6 +34,9 @@ public class Recipe {
     @Enumerated(EnumType.STRING)
     private Source generatedBy;
 
+    @Column(name = "servings")
+    private Integer servings;
+
     @Column(name = "prep_time_min")
     private Integer prepTimeMin;
 
@@ -64,15 +67,17 @@ public class Recipe {
      * @param description
      * @param foodType
      * @param generatedBy
+     * @param servings
      * @param prepTimeMin
      * @param cookTimeMin
      */
-    public Recipe(String title, User owner, String description, FoodType foodType, Source generatedBy, Integer prepTimeMin, Integer cookTimeMin) {
+    public Recipe(String title, User owner, String description, FoodType foodType, Source generatedBy, Integer servings, Integer prepTimeMin, Integer cookTimeMin) {
         this.title = title;
         this.owner = owner;
         this.description = description;
         this.foodType = foodType;
         this.generatedBy = generatedBy;
+        this.servings = servings;
         this.prepTimeMin = prepTimeMin;
         this.cookTimeMin = cookTimeMin;
     }
@@ -134,6 +139,14 @@ public class Recipe {
 
     public void setGeneratedBy(Source generatedBy) {
         this.generatedBy = generatedBy;
+    }
+
+    public Integer getServings() {
+        return servings;
+    }
+
+    public void setServings(Integer servings) {
+        this.servings = servings;
     }
 
     public Integer getPrepTimeMin() {

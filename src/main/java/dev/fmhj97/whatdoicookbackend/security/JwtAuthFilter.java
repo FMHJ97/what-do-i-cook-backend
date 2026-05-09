@@ -14,6 +14,11 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
+/**
+ * Filter that intercepts every HTTP request and validates the JWT token.
+ * If the token is valid, authenticates the user in Spring Security's context.
+ * Extends OncePerRequestFilter to ensure it runs only once per request.
+ */
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
 

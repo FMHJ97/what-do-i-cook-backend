@@ -10,6 +10,10 @@ import org.springframework.stereotype.Service;
 import javax.crypto.SecretKey;
 import java.util.Date;
 
+/**
+ * Service responsible for JWT token operations.
+ * Handles token generation, validation and username extraction.
+ */
 @Service
 public class JwtService {
 

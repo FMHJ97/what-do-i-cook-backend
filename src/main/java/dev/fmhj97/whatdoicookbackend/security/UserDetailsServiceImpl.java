@@ -9,6 +9,10 @@ import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+/**
+ * Implementation of Spring Security's UserDetailsService.
+ * Loads user data from the database by username for authentication purposes.
+ */
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 
