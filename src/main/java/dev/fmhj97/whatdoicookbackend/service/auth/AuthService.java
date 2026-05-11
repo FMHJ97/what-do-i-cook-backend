@@ -74,7 +74,7 @@ public class AuthService {
     }
 
     /**
-     * Registers a new user (role = 'USER', encodes the password,
+     * Registers a new user (role = 'USER'), encodes the password,
      * saves the user to the database, and returns a JWT token.
      * @param dto the registration request
      * @return an AuthResponseDto containing the JWT token

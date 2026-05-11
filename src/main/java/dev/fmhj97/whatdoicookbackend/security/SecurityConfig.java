@@ -1,8 +1,10 @@
 package dev.fmhj97.whatdoicookbackend.security;
 
+import dev.fmhj97.whatdoicookbackend.entity.enums.Role;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -79,7 +81,9 @@ public class SecurityConfig {
                                 "/v3/api-docs/**"
                         ).permitAll()
                         .requestMatchers("/api/auth/**").permitAll()
-                        // <- Endpoints
+                        // Ingredient Endpoints
+                        .requestMatchers(HttpMethod.GET, "/api/ingredient/**").authenticated()
+                        .requestMatchers("/api/ingredient/**").hasRole(Role.ADMIN.name())
                         .anyRequest().authenticated()
                 )
 
