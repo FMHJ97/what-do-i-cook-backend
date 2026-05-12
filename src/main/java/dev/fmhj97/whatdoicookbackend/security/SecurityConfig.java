@@ -78,21 +78,31 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/v3/api-docs/**"
+                                "/v3/api-docs/**",
+                                "/api/auth/**"
                         ).permitAll()
-                        .requestMatchers("/api/auth/**").permitAll()
                         // Ingredient Endpoints
                         .requestMatchers(HttpMethod.GET, "/api/ingredient/**").authenticated()
                         .requestMatchers("/api/ingredient/**").hasRole(Role.ADMIN.name())
+                        // Recipe Endpoints
+                        .requestMatchers("/api/recipe/**").hasRole(Role.USER.name())
                         .anyRequest().authenticated()
                 )
 
-                // Return 401 (Unauthorized) JSON for authentication failures (instead of Spring's default behavior).
+                // Handle authentication and authorization errors with JSON responses
+                // instead of Spring's default HTML error pages.
+                // 401 (Unauthorized) -> missing or invalid JWT token.
+                // 403 (Forbidden) -> authenticated but insufficient permissions.
                 .exceptionHandling(ex -> ex
                         .authenticationEntryPoint((request, response, authException) -> {
                             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
                             response.setContentType("application/json");
                             response.getWriter().write("{\"error\": \"Invalid credentials\"}");
+                        })
+                        .accessDeniedHandler((request, response, accessDeniedException) -> {
+                            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"error\": \"Access denied\"}");
                         })
                 )
 

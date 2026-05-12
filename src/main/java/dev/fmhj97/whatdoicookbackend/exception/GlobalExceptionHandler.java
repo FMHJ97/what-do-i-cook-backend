@@ -2,6 +2,8 @@ package dev.fmhj97.whatdoicookbackend.exception;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
@@ -42,6 +44,27 @@ public class GlobalExceptionHandler {
                         e.getField(), e.getDefaultMessage()
                 ));
         return ResponseEntity.badRequest().body(errors);
+    }
+
+    // Error 400 (Invalid JSON or unrecognized value)
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, String>> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(Map.of("error", "Invalid request body or unrecognized value"));
+    }
+
+    // Error 401 (Invalid credentials)
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Map<String, String>> handleBadCredentials(BadCredentialsException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(Map.of("error", "Invalid username or password"));
+    }
+
+    // Error 403 (Forbidden)
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity<Map<String, String>> handleForbidden(ForbiddenException ex) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(Map.of("error", ex.getMessage()));
     }
 
     // Error 500 (Internal Server Error)

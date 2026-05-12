@@ -15,4 +15,8 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     List<Recipe> findByOwnerIdAndTitleContainingIgnoreCase(Long ownerId, String title);
 
     List<Recipe> findByOwnerIdAndFoodType(Long ownerId, FoodType foodType);
+
+    List<Recipe> findByOwnerIdAndTitleContainingIgnoreCaseAndFoodType(Long ownerId, String title, FoodType foodType);
+
+    Boolean existsByOwnerIdAndTitleIgnoreCase(Long ownerId, String title);
 }
