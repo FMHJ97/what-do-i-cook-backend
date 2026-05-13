@@ -49,6 +49,27 @@ public class RecipeStepService {
     }
 
     /**
+     * Returns a single step by its ID.
+     * @param currentUser The current user.
+     * @param recipeId The recipe ID.
+     * @param stepId The step ID.
+     * @return The existing step.
+     */
+    @Transactional(readOnly = true)
+    public RecipeStepResponseDto getRecipeStepById(
+            User currentUser, Long recipeId, Long stepId
+    ) {
+        RecipeStep recipeStep = recipeStepRepository.findByIdAndRecipeId(stepId, recipeId)
+                .orElseThrow(() -> new ResourceNotFoundException("RecipeStep not found with id: " + stepId));
+
+        if (!recipeStep.getRecipe().getOwner().getId().equals(currentUser.getId())) {
+            throw new ForbiddenException("You do not have permission to access this RecipeStep");
+        }
+
+        return RecipeStepResponseDto.from(recipeStep);
+    }
+
+    /**
      * Adds a new step to the given recipe. Step number is assigned automatically.
      * @param recipeId The recipe ID.
      * @param currentUser The current user.
@@ -78,6 +99,7 @@ public class RecipeStepService {
 
     /**
      * Deletes a step by its ID and renumbers the remaining steps.
+     * @param recipeId The recipe ID.
      * @param currentUser The current user.
      * @param stepId The step ID.
      */
@@ -85,7 +107,7 @@ public class RecipeStepService {
     public void deleteRecipeStep(
             Long recipeId, User currentUser, Long stepId
     ) {
-        RecipeStep recipeStep = recipeStepRepository.findById(stepId)
+        RecipeStep recipeStep = recipeStepRepository.findByIdAndRecipeId(stepId, recipeId)
                 .orElseThrow(() -> new ResourceNotFoundException("RecipeStep not found with id: " + stepId));
 
         if (!recipeStep.getRecipe().getOwner().getId().equals(currentUser.getId())) {
@@ -108,15 +130,16 @@ public class RecipeStepService {
     /**
      * Updates an existing step by its ID.
      * @param currentUser The current user.
+     * @param recipeId The recipe ID.
      * @param stepId The step ID.
      * @param dto The updated data.
      * @return The updated step.
      */
     @Transactional
     public RecipeStepResponseDto updateRecipeStep(
-            User currentUser, Long stepId, RecipeStepUpdateDto dto
+            User currentUser, Long recipeId, Long stepId, RecipeStepUpdateDto dto
     ) {
-        RecipeStep recipeStep = recipeStepRepository.findById(stepId)
+        RecipeStep recipeStep = recipeStepRepository.findByIdAndRecipeId(stepId, recipeId)
                 .orElseThrow(() -> new ResourceNotFoundException("RecipeStep not found with id: " + stepId));
 
         if (!recipeStep.getRecipe().getOwner().getId().equals(currentUser.getId())) {

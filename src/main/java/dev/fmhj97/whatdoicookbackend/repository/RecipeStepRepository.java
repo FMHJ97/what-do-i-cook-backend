@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface RecipeStepRepository extends JpaRepository<RecipeStep, Long> {
@@ -16,5 +17,7 @@ public interface RecipeStepRepository extends JpaRepository<RecipeStep, Long> {
     @Query("SELECT COALESCE(MAX(rs.stepNumber), 0) FROM RecipeStep rs " +
             "WHERE rs.recipe.id = :recipeId")
     Integer findMaxStepNumberByRecipeId(@Param("recipeId") Long recipeId);
+
+    Optional<RecipeStep> findByIdAndRecipeId(Long id, Long recipeId);
 
 }

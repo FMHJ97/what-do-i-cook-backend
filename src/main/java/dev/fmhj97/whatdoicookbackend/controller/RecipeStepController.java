@@ -39,10 +39,22 @@ public class RecipeStepController {
         );
     }
 
+    @GetMapping("/{stepId}")
+    @Operation(summary = "Returns a single step for the given recipe")
+    public ResponseEntity<RecipeStepResponseDto> getRecipeStepById(
+            @PathVariable Long recipeId,
+            @PathVariable Long stepId,
+            @AuthenticationPrincipal User currentUser
+    ) {
+        return ResponseEntity.ok(
+                recipeStepService.getRecipeStepById(currentUser, recipeId, stepId)
+        );
+    }
+
     @PostMapping
     @Operation(summary = "Adds a new step to the given recipe")
     public ResponseEntity<RecipeStepResponseDto> createRecipeStep(
-            @PathVariable Long recipeId,    // Just for the URL
+            @PathVariable Long recipeId,
             @RequestBody @Valid RecipeStepCreateDto dto,
             @AuthenticationPrincipal User currentUser
     ) {
@@ -59,7 +71,7 @@ public class RecipeStepController {
             @AuthenticationPrincipal User currentUser
     ) {
         return ResponseEntity.ok(
-                recipeStepService.updateRecipeStep(currentUser, stepId, dto)
+                recipeStepService.updateRecipeStep(currentUser, recipeId, stepId, dto)
         );
     }
 
