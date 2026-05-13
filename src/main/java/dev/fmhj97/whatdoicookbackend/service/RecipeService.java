@@ -12,6 +12,7 @@ import dev.fmhj97.whatdoicookbackend.exception.ForbiddenException;
 import dev.fmhj97.whatdoicookbackend.exception.ResourceNotFoundException;
 import dev.fmhj97.whatdoicookbackend.repository.RecipeRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -34,6 +35,7 @@ public class RecipeService {
      * @param currentUser The current user.
      * @return The recipe data.
      */
+    @Transactional(readOnly = true)
     public RecipeResponseDto getRecipeById(Long id, User currentUser) {
         Recipe recipe = recipeRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id: " + id));
@@ -54,6 +56,7 @@ public class RecipeService {
      * @param foodType Optional filter by recipe foodType.
      * @return List of recipes.
      */
+    @Transactional(readOnly = true)
     public List<RecipeResponseDto> getMyRecipes(User currentUser, String title, FoodType foodType) {
 
         boolean hasTitle = title != null && !title.isBlank();
@@ -89,6 +92,7 @@ public class RecipeService {
      * @param dto The recipe data.
      * @return The created recipe.
      */
+    @Transactional
     public RecipeResponseDto createRecipe(User currentUser, RecipeCreateDto dto) {
 
         if (recipeRepository.existsByOwnerIdAndTitleIgnoreCase(currentUser.getId(), dto.title())) {
@@ -114,6 +118,7 @@ public class RecipeService {
      * @param currentUser The current user.
      * @param id The recipe ID.
      */
+    @Transactional
     public void deleteRecipe(User currentUser, Long id) {
 
         Recipe recipe = recipeRepository.findById(id)
@@ -133,6 +138,7 @@ public class RecipeService {
      * @param dto The updated data.
      * @return The updated recipe.
      */
+    @Transactional
     public RecipeResponseDto updateRecipe(User currentUser, Long id, RecipeUpdateDto dto) {
 
         Recipe recipe = recipeRepository.findById(id)

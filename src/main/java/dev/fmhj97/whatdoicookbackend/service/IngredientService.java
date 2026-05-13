@@ -8,6 +8,7 @@ import dev.fmhj97.whatdoicookbackend.exception.DuplicateResourceException;
 import dev.fmhj97.whatdoicookbackend.exception.ResourceNotFoundException;
 import dev.fmhj97.whatdoicookbackend.repository.IngredientRepository;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -30,6 +31,7 @@ public class IngredientService {
      * @param id The ingredient ID.
      * @return The ingredient data.
      */
+    @Transactional(readOnly = true)
     public IngredientResponseDto getIngredientById(Long id) {
         Ingredient ingredient = ingredientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ingredient not found with id: " + id));
@@ -42,6 +44,7 @@ public class IngredientService {
      * @param name The ingredient name.
      * @return The ingredient data.
      */
+    @Transactional(readOnly = true)
     public IngredientResponseDto getIngredientByName(String name) {
         Ingredient ingredient = ingredientRepository.findByNameIgnoreCase(name)
                 .orElseThrow(() -> new ResourceNotFoundException("Ingredient not found with name: " + name));
@@ -54,6 +57,7 @@ public class IngredientService {
      * @param name Optional filter by ingredient name.
      * @return List of ingredients.
      */
+    @Transactional(readOnly = true)
     public List<IngredientResponseDto> getIngredients(String name) {
         if (name != null && !name.isBlank()) {
             return ingredientRepository.findByNameContainingIgnoreCase(name).stream()
@@ -70,6 +74,7 @@ public class IngredientService {
      * Deletes an ingredient by the given ID.
      * @param id The ingredient ID.
      */
+    @Transactional
     public void deleteIngredient(Long id) {
         if (!ingredientRepository.existsById(id)) throw new ResourceNotFoundException("Ingredient not found with id: " + id);
 
@@ -81,6 +86,7 @@ public class IngredientService {
      * @param dto The ingredient data.
      * @return The created ingredient.
      */
+    @Transactional
     public IngredientResponseDto addIngredient(IngredientCreateDto dto) {
         if (ingredientRepository.existsByNameIgnoreCase(dto.name()))
             throw new DuplicateResourceException("Name already exists: " + dto.name());
@@ -96,6 +102,7 @@ public class IngredientService {
      * @param dto The updated data.
      * @return The updated ingredient.
      */
+    @Transactional
     public IngredientResponseDto updateIngredient(Long id, IngredientUpdateDto dto) {
         Ingredient ingredient = ingredientRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Ingredient not found with id: " + id));

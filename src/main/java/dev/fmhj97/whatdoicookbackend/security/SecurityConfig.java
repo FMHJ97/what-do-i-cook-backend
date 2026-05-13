@@ -82,10 +82,10 @@ public class SecurityConfig {
                                 "/api/auth/**"
                         ).permitAll()
                         // Ingredient Endpoints
-                        .requestMatchers(HttpMethod.GET, "/api/ingredient/**").authenticated()
-                        .requestMatchers("/api/ingredient/**").hasRole(Role.ADMIN.name())
-                        // Recipe Endpoints
-                        .requestMatchers("/api/recipe/**").hasRole(Role.USER.name())
+                        .requestMatchers(HttpMethod.GET, "/api/ingredients/**").authenticated()
+                        .requestMatchers("/api/ingredients/**").hasRole(Role.ADMIN.name())
+                        // Recipe Endpoints (including RecipeStep and RecipeIngredient)
+                        .requestMatchers("/api/recipes/**").hasRole(Role.USER.name())
                         .anyRequest().authenticated()
                 )
 

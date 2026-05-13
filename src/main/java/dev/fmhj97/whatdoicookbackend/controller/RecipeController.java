@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/recipe")
+@RequestMapping("/api/recipes")
 @SecurityRequirement(name = "bearerAuth")
 @Tag(name = "Recipe", description = "Endpoints related to recipes")
 public class RecipeController {

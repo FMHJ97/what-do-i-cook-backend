@@ -10,10 +10,10 @@ import dev.fmhj97.whatdoicookbackend.repository.UserRepository;
 import dev.fmhj97.whatdoicookbackend.security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 public class AuthService {
@@ -52,6 +52,7 @@ public class AuthService {
      * @param dto the login request containing email and password
      * @return an AuthResponseDto containing the JWT token
      */
+    @Transactional
     public AuthResponseDto login(LoginRequestDto dto) {
 
         // Verify credentials — loads the user from the database and compares
@@ -79,6 +80,7 @@ public class AuthService {
      * @param dto the registration request
      * @return an AuthResponseDto containing the JWT token
      */
+    @Transactional
     public AuthResponseDto register(RegisterRequestDto dto) {
 
         // Check if the email or username already exist in the database.

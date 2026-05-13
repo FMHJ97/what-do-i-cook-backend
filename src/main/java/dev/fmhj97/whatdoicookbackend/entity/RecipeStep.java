@@ -30,12 +30,10 @@ public class RecipeStep {
     /**
      * Constructor with args
      * @param recipe
-     * @param stepNumber
      * @param description
      */
-    public RecipeStep(Recipe recipe, Integer stepNumber, String description) {
+    public RecipeStep(Recipe recipe, String description) {
         this.recipe = recipe;
-        this.stepNumber = stepNumber;
         this.description = description;
     }
 
