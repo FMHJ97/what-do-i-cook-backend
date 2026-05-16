@@ -1,6 +1,7 @@
 package dev.fmhj97.whatdoicookbackend.controller;
 
 import dev.fmhj97.whatdoicookbackend.dto.recipe.RecipeCreateDto;
+import dev.fmhj97.whatdoicookbackend.dto.recipe.RecipeDetailsResponseDto;
 import dev.fmhj97.whatdoicookbackend.dto.recipe.RecipeResponseDto;
 import dev.fmhj97.whatdoicookbackend.dto.recipe.RecipeUpdateDto;
 import dev.fmhj97.whatdoicookbackend.entity.User;
@@ -56,6 +57,24 @@ public class RecipeController {
     }
 
     /**
+     * Returns a random recipe owned by the current user.
+     * If a foodType is provided, filters by it.
+     * @param foodType Optional filter by food type.
+     * @param currentUser The current user.
+     * @return A random recipe with full details.
+     */
+    @GetMapping("/random")
+    @Operation(summary = "Returns a random recipe. If a foodType is provided, filters by it")
+    public ResponseEntity<RecipeDetailsResponseDto> getRandomRecipe(
+            @RequestParam(required = false) FoodType foodType,
+            @AuthenticationPrincipal User currentUser
+    ) {
+        return ResponseEntity.ok(
+                recipeService.getRandomRecipe(currentUser, foodType)
+        );
+    }
+
+    /**
      * Returns a single recipe by its ID (owned by the current user).
      * @param id The recipe ID.
      * @param currentUser The current user.
@@ -69,6 +88,23 @@ public class RecipeController {
     ) {
         return ResponseEntity.ok(
                 recipeService.getRecipeById(id, currentUser)
+        );
+    }
+
+    /**
+     * Returns the full details of a recipe, including its ingredients and steps.
+     * @param id The recipe ID.
+     * @param currentUser The current user.
+     * @return The recipe details.
+     */
+    @GetMapping("/{id}/details")
+    @Operation(summary = "Returns the full details of a recipe, including its ingredients and steps")
+    public ResponseEntity<RecipeDetailsResponseDto> getRecipeDetails(
+            @PathVariable Long id,
+            @AuthenticationPrincipal User currentUser
+    ) {
+        return ResponseEntity.ok(
+                recipeService.getRecipeDetails(id, currentUser)
         );
     }
 

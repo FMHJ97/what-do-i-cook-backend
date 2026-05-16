@@ -6,6 +6,7 @@ import jakarta.persistence.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "recipes", uniqueConstraints = {
@@ -52,8 +53,10 @@ public class Recipe {
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<RecipeIngredient> recipeIngredients;
 
+    // Set is used instead of List to avoid Hibernate's MultipleBagFetchException
+    // when using multiple JOIN FETCH in the same query.
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.REMOVE, orphanRemoval = true)
-    private List<RecipeStep> recipeSteps;
+    private Set<RecipeStep> recipeSteps;
 
     /**
      * JPA Constructor
@@ -177,7 +180,7 @@ public class Recipe {
         return recipeIngredients;
     }
 
-    public List<RecipeStep> getRecipeSteps() {
+    public Set<RecipeStep> getRecipeSteps() {
         return recipeSteps;
     }
 }

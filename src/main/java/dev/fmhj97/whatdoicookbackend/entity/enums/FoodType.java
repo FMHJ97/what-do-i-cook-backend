@@ -10,5 +10,5 @@ public enum FoodType {
     FISH,
     VEGETABLE,
     DESSERT,
-    OTHERS
+    OTHER
 }

@@ -1,6 +1,7 @@
 package dev.fmhj97.whatdoicookbackend.service;
 
 import dev.fmhj97.whatdoicookbackend.dto.recipe.RecipeCreateDto;
+import dev.fmhj97.whatdoicookbackend.dto.recipe.RecipeDetailsResponseDto;
 import dev.fmhj97.whatdoicookbackend.dto.recipe.RecipeResponseDto;
 import dev.fmhj97.whatdoicookbackend.dto.recipe.RecipeUpdateDto;
 import dev.fmhj97.whatdoicookbackend.entity.Recipe;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class RecipeService {
@@ -169,5 +171,49 @@ public class RecipeService {
         if (dto.cookTimeMin() != null) recipe.setCookTimeMin(dto.cookTimeMin());
 
         return RecipeResponseDto.from(recipeRepository.save(recipe));
+    }
+
+    /**
+     * Returns the full details of a recipe, including its ingredients and steps.
+     * @param id The recipe ID.
+     * @param currentUser The current user.
+     * @return The recipe details.
+     */
+    @Transactional(readOnly = true)
+    public RecipeDetailsResponseDto getRecipeDetails(Long id, User currentUser) {
+        Recipe recipe = recipeRepository.findByIdAndOwnerIdWithDetails(id, currentUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id: " + id));
+
+        return RecipeDetailsResponseDto.from(recipe);
+    }
+
+    /**
+     * Returns a random recipe owned by the current user.
+     * If a foodType is provided, filters by it.
+     * @param currentUser The current user.
+     * @param foodType Optional filter by food type.
+     * @return A random recipe with full details.
+     */
+    @Transactional(readOnly = true)
+    public RecipeDetailsResponseDto getRandomRecipe(User currentUser, FoodType foodType) {
+
+        Optional<Recipe> randomRecipe;
+
+        if (foodType != null) {
+            randomRecipe = recipeRepository.findRandomByOwnerIdAndFoodType(currentUser.getId(), foodType.name());
+        } else {
+            randomRecipe = recipeRepository.findRandomByOwnerId(currentUser.getId());
+        }
+
+        // Extract the ID from the random recipe found, or throw 404 if none exists.
+        Long recipeId = randomRecipe
+                .orElseThrow(() -> new ResourceNotFoundException("No recipes found"))
+                .getId();
+
+        // Load the full recipe with ingredients and steps using JOIN FETCH.
+        Recipe fullRecipe = recipeRepository.findByIdAndOwnerIdWithDetails(recipeId, currentUser.getId())
+                .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id: " + recipeId));
+
+        return RecipeDetailsResponseDto.from(fullRecipe);
     }
 }
