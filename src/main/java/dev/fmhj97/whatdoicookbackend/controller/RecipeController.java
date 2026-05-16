@@ -74,6 +74,18 @@ public class RecipeController {
         );
     }
 
+    @GetMapping("/filter")
+    @Operation(summary = "Returns recipes matching the given ingredients, ordered by number of matches. Optional foodType filter")
+    public ResponseEntity<List<RecipeResponseDto>> getRecipesByIngredients(
+            @RequestParam List<Long> ingredientIds,
+            @RequestParam(required = false) FoodType foodType,
+            @AuthenticationPrincipal User currentUser
+    ) {
+        return ResponseEntity.ok(
+                recipeService.getRecipesByFilter(currentUser, ingredientIds, foodType)
+        );
+    }
+
     /**
      * Returns a single recipe by its ID (owned by the current user).
      * @param id The recipe ID.

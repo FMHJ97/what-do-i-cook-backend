@@ -10,6 +10,7 @@ import dev.fmhj97.whatdoicookbackend.entity.enums.FoodType;
 import dev.fmhj97.whatdoicookbackend.entity.enums.Source;
 import dev.fmhj97.whatdoicookbackend.exception.DuplicateResourceException;
 import dev.fmhj97.whatdoicookbackend.exception.ForbiddenException;
+import dev.fmhj97.whatdoicookbackend.exception.InvalidDataException;
 import dev.fmhj97.whatdoicookbackend.exception.ResourceNotFoundException;
 import dev.fmhj97.whatdoicookbackend.repository.RecipeRepository;
 import org.springframework.stereotype.Service;
@@ -215,5 +216,36 @@ public class RecipeService {
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id: " + recipeId));
 
         return RecipeDetailsResponseDto.from(fullRecipe);
+    }
+
+    /**
+     * Returns a list of recipes owned by the current user that match the given ingredients.
+     * If a foodType is provided, filters by it.
+     * Ordered by number of matching ingredients (most to least).
+     * @param currentUser The current user.
+     * @param ingredientIds List of ingredient IDs to filter by.
+     * @param foodType Optional filter by food type.
+     * @return List of matching recipes.
+     */
+    @Transactional(readOnly = true)
+    public List<RecipeResponseDto> getRecipesByFilter(
+            User currentUser, List<Long> ingredientIds, FoodType foodType
+    ) {
+
+        if (ingredientIds == null || ingredientIds.isEmpty()) {
+            throw new InvalidDataException("At least one ingredient ID is required");
+        }
+
+        if (foodType != null) {
+            return recipeRepository.findByOwnerIdAndIngredientIdsAndFoodType(
+                    currentUser.getId(), ingredientIds, foodType.name()).stream()
+                    .map(RecipeResponseDto::from)
+                    .toList();
+        } else {
+            return recipeRepository.findByOwnerIdAndIngredientIds(currentUser.getId(), ingredientIds).stream()
+                    .map(RecipeResponseDto::from)
+                    .toList();
+        }
+
     }
 }

@@ -41,4 +41,28 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
     Optional<Recipe> findRandomByOwnerIdAndFoodType(
             @Param("ownerId") Long ownerId,
             @Param("foodType") String foodType); // Native queries don't recognise Enums (JPQL does it).
+
+    @Query(value = "SELECT r.* FROM recipes r " +
+            "JOIN recipe_ingredient ri ON ri.recipe_id = r.id " +
+            "WHERE r.user_id = :ownerId " +
+            "AND ri.ingredient_id IN (:ingredientIds) " +
+            "GROUP BY r.id " +
+            "ORDER BY COUNT(ri.ingredient_id) DESC", nativeQuery = true)
+    List<Recipe> findByOwnerIdAndIngredientIds(
+            @Param("ownerId") Long ownerId,
+            @Param("ingredientIds") List<Long> ingredientIds
+    );
+
+    @Query(value = "SELECT r.* FROM recipes r " +
+            "JOIN recipe_ingredient ri ON ri.recipe_id = r.id " +
+            "WHERE r.user_id = :ownerId " +
+            "AND ri.ingredient_id IN (:ingredientIds) " +
+            "AND r.food_type = :foodType " +
+            "GROUP BY r.id " +
+            "ORDER BY COUNT(ri.ingredient_id) DESC", nativeQuery = true)
+    List<Recipe> findByOwnerIdAndIngredientIdsAndFoodType(
+            @Param("ownerId") Long ownerId,
+            @Param("ingredientIds") List<Long> ingredientIds,
+            @Param("foodType") String foodType
+    );
 }
