@@ -6,6 +6,15 @@ This project was built as a personal project to learn and practice Spring Boot, 
 
 ---
 
+## 🌐 Live Demo
+
+- **API Base URL:** https://what-do-i-cook-backend.onrender.com
+- **Swagger UI:** https://what-do-i-cook-backend.onrender.com/swagger-ui/index.html
+
+> The service runs on Render's free tier. If it hasn't received any requests in the last 15 minutes, the first request may take around 30 seconds to respond.
+
+---
+
 ## ✨ Features
 
 ### Users
@@ -33,6 +42,8 @@ This project was built as a personal project to learn and practice Spring Boot, 
 | Database | PostgreSQL |
 | Documentation | SpringDoc OpenAPI (Swagger UI) |
 | Build | Maven |
+| Containerization | Docker + Docker Compose |
+| Testing | JUnit 5 + Mockito |
 
 ---
 
@@ -69,19 +80,13 @@ Controller → Service → Repository → Database
 | GET | `/api/ingredients` | Browse ingredient catalog | USER + ADMIN |
 | POST/PATCH/DELETE | `/api/ingredients` | Manage ingredient catalog | ADMIN |
 
-Full API documentation available at `/swagger-ui.html` when running locally.
+Full API documentation available at `/swagger-ui/index.html`.
 
 ---
 
 ## 🚀 Running Locally
 
-### Requirements
-
-- Java 21+
-- Maven
-- PostgreSQL
-
-### Steps
+### Option A — Maven (requires Java 21+ and PostgreSQL)
 
 1. Clone the repository:
    ```bash
@@ -97,14 +102,14 @@ Full API documentation available at `/swagger-ui.html` when running locally.
 3. Set the following environment variables (in your IDE or system):
 
    ```
+   DB_URL=jdbc:postgresql://localhost:5432/what_do_i_cook
+   DB_USERNAME=your_db_user
+   DB_PASSWORD=your_db_password
    JWT_SECRET=your_base64_secret
    JWT_EXPIRATION=86400000
    ADMIN_USERNAME=admin
    ADMIN_EMAIL=admin@example.com
    ADMIN_PASSWORD=your_password
-   DB_URL=jdbc:postgresql://localhost:5432/what_do_i_cook
-   DB_USERNAME=your_db_user
-   DB_PASSWORD=your_db_password
    ```
 
 4. Run the application:
@@ -112,10 +117,37 @@ Full API documentation available at `/swagger-ui.html` when running locally.
    mvn spring-boot:run
    ```
 
-5. Access the Swagger UI at:
+5. Access the Swagger UI at `http://localhost:8080/swagger-ui/index.html`.
+
+---
+
+### Option B — Docker Compose (Docker Desktop required)
+
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/FMHJ97/what-do-i-cook-backend.git
+   cd what-do-i-cook-backend
    ```
-   http://localhost:8080/swagger-ui.html
+
+2. Create a `.env` file in the root of the project:
+
    ```
+   DB_URL=jdbc:postgresql://postgres:5432/what_do_i_cook
+   DB_USERNAME=your_db_user
+   DB_PASSWORD=your_db_password
+   JWT_SECRET=your_base64_secret
+   JWT_EXPIRATION=86400000
+   ADMIN_USERNAME=admin
+   ADMIN_EMAIL=admin@example.com
+   ADMIN_PASSWORD=your_password
+   ```
+
+3. Start the app and database together:
+   ```bash
+   docker-compose up --build
+   ```
+
+4. Access the Swagger UI at `http://localhost:8080/swagger-ui/index.html`.
 
 On startup, the app automatically creates the default admin user and seeds the ingredient catalog (107 ingredients).
 
@@ -130,6 +162,25 @@ Authorization: Bearer <your_jwt_token>
 ```
 
 Get your token by calling `/api/auth/login` or `/api/auth/register`.
+
+---
+
+## 🧪 Testing
+
+The project includes unit tests for all service classes using JUnit 5 and Mockito. Dependencies are fully mocked — no database or Spring context is loaded.
+
+Tests cover:
+
+- `AuthService` — registration, login, duplicate checks, token generation, `lastLoginAt` update.
+- `RecipeService` — CRUD, ownership checks, filtering by title, food type and ingredients.
+- `RecipeStepService` — CRUD, ownership checks, automatic step renumbering on delete.
+- `IngredientService` — CRUD, case-insensitive name filtering, duplicate checks.
+
+Run the tests with:
+
+```bash
+mvn test
+```
 
 ---
 
