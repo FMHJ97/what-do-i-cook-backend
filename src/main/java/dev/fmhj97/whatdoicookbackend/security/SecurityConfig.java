@@ -87,7 +87,7 @@ public class SecurityConfig {
                         // Recipe Endpoints (including RecipeStep and RecipeIngredient)
                         .requestMatchers("/api/recipes/**").hasRole(Role.USER.name())
                         // Profile Endpoints
-                        .requestMatchers("/api/profile/**").authenticated()
+                        .requestMatchers("/api/profile/**").hasRole(Role.USER.name())
                         // Admin Endpoints
                         .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
                         .anyRequest().authenticated()
