@@ -24,7 +24,7 @@ This project was built as a personal project to learn and practice Spring Boot, 
 - Filter their recipes by title, food type, or ingredients they have at home.
 - Get a random recipe suggestion (optionally filtered by food type).
 - View full recipe details including ingredients and steps in a single request.
-- view their own profile info.
+- View their own profile info.
 
 ### Admins
 - Full CRUD for the ingredient catalog.
