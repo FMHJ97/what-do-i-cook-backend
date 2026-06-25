@@ -24,9 +24,11 @@ This project was built as a personal project to learn and practice Spring Boot, 
 - Filter their recipes by title, food type, or ingredients they have at home.
 - Get a random recipe suggestion (optionally filtered by food type).
 - View full recipe details including ingredients and steps in a single request.
+- view their own profile info.
 
 ### Admins
 - Full CRUD for the ingredient catalog.
+- View and delete user accounts.
 - No access to user recipes — full privacy.
 
 ---
@@ -79,6 +81,12 @@ Controller → Service → Repository → Database
 | GET/POST/PATCH/DELETE | `/api/recipes/{id}/ingredients` | Manage recipe ingredients | USER |
 | GET | `/api/ingredients` | Browse ingredient catalog | USER + ADMIN |
 | POST/PATCH/DELETE | `/api/ingredients` | Manage ingredient catalog | ADMIN |
+| GET | `/api/profile` | View your own profile | USER |
+| PATCH | `/api/profile/password` | Change your own password | USER |
+| DELETE | `/api/profile` | Delete your own account | USER |
+| GET | `/api/admin/users` | List all users (excluding admins) | ADMIN |
+| GET | `/api/admin/users/{id}` | Get a user by ID | ADMIN |
+| DELETE | `/api/admin/users/{id}` | Delete a user by ID | ADMIN |
 
 Full API documentation available at `/swagger-ui/index.html`.
 
@@ -175,6 +183,7 @@ Tests cover:
 - `RecipeService` — CRUD, ownership checks, filtering by title, food type and ingredients.
 - `RecipeStepService` — CRUD, ownership checks, automatic step renumbering on delete.
 - `IngredientService` — CRUD, case-insensitive name filtering, duplicate checks.
+- `UserService` — profile info, password change, account deletion with password verification, admin user management.
 
 Run the tests with:
 
