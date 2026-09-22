@@ -50,6 +50,8 @@ public class Recipe {
     @Column(name = "updated_at", nullable = false)
     private LocalDateTime updatedAt;
 
+    // Ordered by insertion (identity id) so ingredients are shown in the order they were added.
+    @OrderBy("id ASC")
     @OneToMany(mappedBy = "recipe", cascade = CascadeType.REMOVE, orphanRemoval = true)
     private List<RecipeIngredient> recipeIngredients;
 

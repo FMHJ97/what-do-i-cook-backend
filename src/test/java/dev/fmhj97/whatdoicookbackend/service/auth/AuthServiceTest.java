@@ -11,6 +11,7 @@ import dev.fmhj97.whatdoicookbackend.security.JwtService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -72,8 +73,12 @@ class AuthServiceTest {
         assertThat(result.token()).isEqualTo("jwt-token");
 
         // Verify — check that specific methods were called
-        verify(userRepository).save(any(User.class));
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+        verify(userRepository).save(userCaptor.capture());
         verify(jwtService).generateJwtToken(any(User.class));
+
+        // Registration authenticates the user, so lastLoginAt must be set on first signup.
+        assertThat(userCaptor.getValue().getLastLoginAt()).isNotNull();
     }
 
     @Test

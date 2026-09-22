@@ -59,7 +59,7 @@ public class RecipeIngredientService {
             throw new ForbiddenException("You do not have permission to access this RecipeIngredient");
         }
 
-        return recipeIngredientRepository.findByRecipeId(recipeId).stream()
+        return recipeIngredientRepository.findByRecipeIdOrderByIdAsc(recipeId).stream()
                 .map(RecipeIngredientResponseDto::from)
                 .toList();
     }

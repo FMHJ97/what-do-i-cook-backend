@@ -98,6 +98,9 @@ public class AuthService {
                 dto.username(), dto.email(), encodedPassword, Role.USER
         );
 
+        // Registration authenticates the user, so the first login timestamp is set here.
+        newUser.updateLastLoginAt();
+
         userRepository.save(newUser);
 
         // Generate and return the JWT token.

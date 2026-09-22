@@ -173,7 +173,7 @@ class RecipeIngredientServiceTest {
     void getRecipeIngredients_ShouldReturnIngredients_WhenOwnerRequests() {
         // Arrange
         when(recipeRepository.findById(1L)).thenReturn(Optional.of(recipe));
-        when(recipeIngredientRepository.findByRecipeId(1L)).thenReturn(List.of(recipeIngredient));
+        when(recipeIngredientRepository.findByRecipeIdOrderByIdAsc(1L)).thenReturn(List.of(recipeIngredient));
 
         // Act
         List<RecipeIngredientResponseDto> result = recipeIngredientService.getRecipeIngredients(owner, 1L);
