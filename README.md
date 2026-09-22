@@ -8,6 +8,7 @@ This project was built as a personal project to learn and practice Spring Boot, 
 
 ## 🌐 Live Demo
 
+- **Full App:** https://what-do-i-cook-frontend.onrender.com
 - **API Base URL:** https://what-do-i-cook-backend.onrender.com
 - **Swagger UI:** https://what-do-i-cook-backend.onrender.com/swagger-ui/index.html
 
