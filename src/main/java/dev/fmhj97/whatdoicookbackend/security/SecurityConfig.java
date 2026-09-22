@@ -33,6 +33,9 @@ public class SecurityConfig {
     @Value("${cors.allowed-origins:http://localhost:5173}")
     private String allowedOrigins;
 
+    @Value("${swagger.enabled:true}")
+    private boolean swaggerEnabled;
+
     /**
      * Constructor with args.
      * @param jwtAuthFilter
@@ -84,25 +87,35 @@ public class SecurityConfig {
                 )
 
                 // Define access rules for each endpoint.
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/swagger-ui/**",
-                                "/swagger-ui.html",
-                                "/v3/api-docs/**",
+                .authorizeHttpRequests(auth -> {
+                        if (swaggerEnabled) {
+                            auth.requestMatchers(
+                                    "/swagger-ui/**",
+                                    "/swagger-ui.html",
+                                    "/v3/api-docs/**"
+                            ).permitAll();
+                        } else {
+                            auth.requestMatchers(
+                                    "/swagger-ui/**",
+                                    "/swagger-ui.html",
+                                    "/v3/api-docs/**"
+                            ).denyAll();
+                        }
+                        auth.requestMatchers(
                                 "/api/auth/**"
-                        ).permitAll()
+                        ).permitAll();
                         // Ingredient Endpoints
-                        .requestMatchers(HttpMethod.GET, "/api/ingredients/**").authenticated()
-                        .requestMatchers("/api/ingredients/**").hasRole(Role.ADMIN.name())
+                        auth.requestMatchers(HttpMethod.GET, "/api/ingredients/**").authenticated();
+                        auth.requestMatchers("/api/ingredients/**").hasRole(Role.ADMIN.name());
                         // Recipe Endpoints (including RecipeStep and RecipeIngredient)
-                        .requestMatchers("/api/recipes/**").hasRole(Role.USER.name())
+                        auth.requestMatchers("/api/recipes/**").hasRole(Role.USER.name());
                         // Profile Endpoints
-                        .requestMatchers(HttpMethod.GET, "/api/profile").hasAnyRole(Role.USER.name(), Role.ADMIN.name())
-                        .requestMatchers("/api/profile/**").hasRole(Role.USER.name())
+                        auth.requestMatchers(HttpMethod.GET, "/api/profile").hasAnyRole(Role.USER.name(), Role.ADMIN.name());
+                        auth.requestMatchers("/api/profile/**").hasRole(Role.USER.name());
                         // Admin Endpoints
-                        .requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name())
-                        .anyRequest().authenticated()
-                )
+                        auth.requestMatchers("/api/admin/**").hasRole(Role.ADMIN.name());
+                        auth.anyRequest().authenticated();
+                    })
 
                 // Handle authentication and authorization errors with JSON responses
                 // instead of Spring's default HTML error pages.
