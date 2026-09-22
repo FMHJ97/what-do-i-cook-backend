@@ -182,7 +182,7 @@ public class RecipeService {
      */
     @Transactional(readOnly = true)
     public RecipeDetailsResponseDto getRecipeDetails(Long id, User currentUser) {
-        Recipe recipe = recipeRepository.findByIdAndOwnerIdWithDetails(id, currentUser.getId())
+        Recipe recipe = recipeRepository.findByIdAndOwnerIdWithIngredients(id, currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id: " + id));
 
         return RecipeDetailsResponseDto.from(recipe);
@@ -211,8 +211,8 @@ public class RecipeService {
                 .orElseThrow(() -> new ResourceNotFoundException("No recipes found"))
                 .getId();
 
-        // Load the full recipe with ingredients and steps using JOIN FETCH.
-        Recipe fullRecipe = recipeRepository.findByIdAndOwnerIdWithDetails(recipeId, currentUser.getId())
+        // Load the full recipe with ingredients and steps (steps are resolved lazily within the transaction).
+        Recipe fullRecipe = recipeRepository.findByIdAndOwnerIdWithIngredients(recipeId, currentUser.getId())
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id: " + recipeId));
 
         return RecipeDetailsResponseDto.from(fullRecipe);

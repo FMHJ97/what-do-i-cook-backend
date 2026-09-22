@@ -1,5 +1,6 @@
 package dev.fmhj97.whatdoicookbackend.security;
 
+import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -54,32 +55,38 @@ public class JwtAuthFilter extends OncePerRequestFilter {
         // Extract the token by removing "Bearer " prefix (7 characters).
         final String token = authHeader.substring(7);
 
-        // Extract the username from the token payload.
-        final String username = jwtService.extractUsername(token);
+        try {
+            // Extract the username from the token payload.
+            final String username = jwtService.extractUsername(token);
 
-        // If the username is valid and the user is not already authenticated in this request.
-        if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            // If the username is valid and the user is not already authenticated in this request.
+            if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
 
-            // Load the user from the database using the username;
-            UserDetails user = userDetailsService.loadUserByUsername(username);
+                // Load the user from the database using the username;
+                UserDetails user = userDetailsService.loadUserByUsername(username);
 
-            // If the token is valid for this user, create Authorization object with user's info.
-            if (jwtService.isTokenValid(token, user)) {
+                // If the token is valid for this user, create Authorization object with user's info.
+                if (jwtService.isTokenValid(token, user)) {
 
-                // Create an authorization object with user's details and authorities.
-                UsernamePasswordAuthenticationToken authToken =
-                        new UsernamePasswordAuthenticationToken(
-                                user, null, user.getAuthorities()
-                        );
+                    // Create an authorization object with user's details and authorities.
+                    UsernamePasswordAuthenticationToken authToken =
+                            new UsernamePasswordAuthenticationToken(
+                                    user, null, user.getAuthorities()
+                            );
 
-                // Attach request details to the new authorization object.
-                authToken.setDetails(
-                        new WebAuthenticationDetailsSource().buildDetails(request)
-                );
+                    // Attach request details to the new authorization object.
+                    authToken.setDetails(
+                            new WebAuthenticationDetailsSource().buildDetails(request)
+                    );
 
-                // Register the authorization object in Spring Security's context for the request.
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                    // Register the authorization object in Spring Security's context for the request.
+                    SecurityContextHolder.getContext().setAuthentication(authToken);
+                }
             }
+        } catch (JwtException | IllegalArgumentException e) {
+            // Invalid, malformed or expired token — leave the request unauthenticated.
+            // Protected routes will then be rejected by the authentication entry point (401),
+            // instead of surfacing an internal server error from the token parsing.
         }
 
         // Pass the request to the next filter or controller.

@@ -109,7 +109,7 @@ class RecipeStepServiceTest {
     void addRecipeStep_ShouldReturnCreatedStep_WhenOwnerRequests() {
         // Arrange
         RecipeStepCreateDto dto = new RecipeStepCreateDto("Boil water");
-        when(recipeRepository.findById(1L)).thenReturn(Optional.of(recipe));
+        when(recipeRepository.findByIdWithLock(1L)).thenReturn(Optional.of(recipe));
         when(recipeStepRepository.findMaxStepNumberByRecipeId(1L)).thenReturn(1);
         when(recipeStepRepository.save(any(RecipeStep.class))).thenReturn(step);
 
@@ -125,7 +125,7 @@ class RecipeStepServiceTest {
     void addRecipeStep_ShouldThrowForbiddenException_WhenNotOwner() {
         // Arrange
         RecipeStepCreateDto dto = new RecipeStepCreateDto("Boil water");
-        when(recipeRepository.findById(1L)).thenReturn(Optional.of(recipe));
+        when(recipeRepository.findByIdWithLock(1L)).thenReturn(Optional.of(recipe));
 
         // Assert + Act
         assertThatThrownBy(() -> recipeStepService.addRecipeStep(1L, anotherUser, dto))
@@ -138,7 +138,7 @@ class RecipeStepServiceTest {
     void addRecipeStep_ShouldAssignNextStepNumber_Automatically() {
         // Arrange — current max is 2, so next should be 3
         RecipeStepCreateDto dto = new RecipeStepCreateDto("Third step");
-        when(recipeRepository.findById(1L)).thenReturn(Optional.of(recipe));
+        when(recipeRepository.findByIdWithLock(1L)).thenReturn(Optional.of(recipe));
         when(recipeStepRepository.findMaxStepNumberByRecipeId(1L)).thenReturn(2);
         when(recipeStepRepository.save(any(RecipeStep.class))).thenAnswer(invocation -> {
             RecipeStep saved = invocation.getArgument(0);

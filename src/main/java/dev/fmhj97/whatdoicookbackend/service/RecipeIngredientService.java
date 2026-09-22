@@ -13,6 +13,7 @@ import dev.fmhj97.whatdoicookbackend.exception.ResourceNotFoundException;
 import dev.fmhj97.whatdoicookbackend.repository.IngredientRepository;
 import dev.fmhj97.whatdoicookbackend.repository.RecipeIngredientRepository;
 import dev.fmhj97.whatdoicookbackend.repository.RecipeRepository;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -112,9 +113,16 @@ public class RecipeIngredientService {
 
         RecipeIngredient newRecipeIngredient = new RecipeIngredient(recipe, ingredient, dto.quantity(), dto.unit());
 
-        return RecipeIngredientResponseDto.from(
-                recipeIngredientRepository.save(newRecipeIngredient)
-        );
+        try {
+            return RecipeIngredientResponseDto.from(
+                    recipeIngredientRepository.save(newRecipeIngredient)
+            );
+        } catch (DataIntegrityViolationException e) {
+            // Backstop for the existsByRecipeIdAndIngredientId check under concurrent requests
+            // (and for databases where the unique constraint was never created).
+            throw new DuplicateResourceException("RecipeIngredient already exists with recipe ID: " + recipeId
+                    + " and ingredient ID: " + ingredient.getId());
+        }
     }
 
     /**

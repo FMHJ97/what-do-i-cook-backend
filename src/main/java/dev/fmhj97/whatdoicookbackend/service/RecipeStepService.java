@@ -80,7 +80,9 @@ public class RecipeStepService {
     public RecipeStepResponseDto addRecipeStep(
             Long recipeId, User currentUser, RecipeStepCreateDto dto
     ) {
-        Recipe recipe = recipeRepository.findById(recipeId)
+        // Lock the recipe row so parallel step additions serialize and cannot both read the same
+        // MAX(stepNumber) and produce duplicate step numbers.
+        Recipe recipe = recipeRepository.findByIdWithLock(recipeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Recipe not found with id: " + recipeId));
 
         if (!recipe.getOwner().getId().equals(currentUser.getId())) {

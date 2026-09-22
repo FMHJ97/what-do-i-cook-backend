@@ -23,14 +23,26 @@ public class JwtService {
     @Value(("${jwt.expiration}"))
     private Long expiration;
 
+    private volatile SecretKey signingKey;
+
     /**
      * Generates a signing key from the configured secret.
      * The secret is Base64-decoded and used to create an HMAC-SHA key.
+     * The key is derived once and cached, since it is re-decoded on every token operation.
      * @return Signing key used to sign and verify JWT tokens.
      */
     private SecretKey getSigningKey() {
-        byte[] keyBites = Decoders.BASE64.decode(secret);
-        return Keys.hmacShaKeyFor(keyBites);
+        SecretKey key = signingKey;
+        if (key == null) {
+            synchronized (this) {
+                key = signingKey;
+                if (key == null) {
+                    byte[] keyBytes = Decoders.BASE64.decode(secret);
+                    signingKey = key = Keys.hmacShaKeyFor(keyBytes);
+                }
+            }
+        }
+        return key;
     }
 
     /**

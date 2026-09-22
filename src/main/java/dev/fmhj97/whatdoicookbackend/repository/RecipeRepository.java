@@ -2,7 +2,9 @@ package dev.fmhj97.whatdoicookbackend.repository;
 
 import dev.fmhj97.whatdoicookbackend.entity.Recipe;
 import dev.fmhj97.whatdoicookbackend.entity.enums.FoodType;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -23,14 +25,19 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     Boolean existsByOwnerIdAndTitleIgnoreCase(Long ownerId, String title);
 
-    // Uses two separate JOIN FETCH (ingredients and steps) to load all data in one query.
-    // recipeSteps must be a Set in the Recipe entity to avoid MultipleBagFetchException.
+    // Fetches only the ingredient collection. Steps are resolved separately (lazily inside the
+    // service's read-only transaction) to avoid a cartesian product between the two collections,
+    // which would duplicate each ingredient once per step.
     @Query("SELECT r FROM Recipe r " +
             "LEFT JOIN FETCH r.recipeIngredients ri " +
             "LEFT JOIN FETCH ri.ingredient " +
-            "LEFT JOIN FETCH r.recipeSteps " +
             "WHERE r.id = :id AND r.owner.id = :ownerId")
-    Optional<Recipe> findByIdAndOwnerIdWithDetails(@Param("id") Long id, @Param("ownerId") Long ownerId);
+    Optional<Recipe> findByIdAndOwnerIdWithIngredients(@Param("id") Long id, @Param("ownerId") Long ownerId);
+
+    // Pessimistic row lock: serializes concurrent mutations on the same recipe (e.g. step numbering).
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("SELECT r FROM Recipe r WHERE r.id = :id")
+    Optional<Recipe> findByIdWithLock(@Param("id") Long id);
 
     @Query(value = "SELECT * FROM recipes WHERE user_id = :ownerId ORDER BY RANDOM() LIMIT 1",
             nativeQuery = true)
