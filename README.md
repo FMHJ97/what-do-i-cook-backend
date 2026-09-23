@@ -80,11 +80,10 @@ Controller → Service → Repository → Database
 | GET/POST/PATCH/DELETE | `/api/recipes/{id}/ingredients` | Manage recipe ingredients | USER |
 | GET | `/api/ingredients` | Browse ingredient catalog | USER + ADMIN |
 | POST/PATCH/DELETE | `/api/ingredients` | Manage ingredient catalog | ADMIN |
-| GET | `/api/profile` | View your own profile | USER |
+| GET | `/api/profile` | View your own profile | USER + ADMIN |
 | PATCH | `/api/profile/password` | Change your own password | USER |
 | DELETE | `/api/profile` | Delete your own account | USER |
 | GET | `/api/admin/users` | List all users (excluding admins) | ADMIN |
-| GET | `/api/admin/users/{id}` | Get a user by ID | ADMIN |
 | DELETE | `/api/admin/users/{id}` | Delete a user by ID | ADMIN |
 
 Full API documentation available at `/swagger-ui/index.html`.
@@ -154,7 +153,9 @@ Full API documentation available at `/swagger-ui/index.html`.
    docker-compose up --build
    ```
 
-4. Access the Swagger UI at `http://localhost:8080/swagger-ui/index.html`.
+4. The app runs at `http://localhost:8080/`. Note that compose uses the `prod` Spring profile, which **disables Swagger UI and SQL logging** — use `mvn spring-boot:run` (Option A) if you want those.
+
+> The compose PostgreSQL container listens on host port **5433** (5432 inside the container). To point a local Maven run at the compose database, use `DB_URL=jdbc:postgresql://localhost:5433/what_do_i_cook`.
 
 On startup, the app automatically creates the default admin user and seeds the ingredient catalog (107 ingredients).
 
@@ -181,6 +182,7 @@ Tests cover:
 - `AuthService` — registration, login, duplicate checks, token generation, `lastLoginAt` update.
 - `RecipeService` — CRUD, ownership checks, filtering by title, food type and ingredients.
 - `RecipeStepService` — CRUD, ownership checks, automatic step renumbering on delete.
+- `RecipeIngredientService` — CRUD, ownership checks.
 - `IngredientService` — CRUD, case-insensitive name filtering, duplicate checks.
 - `UserService` — profile info, password change, account deletion with password verification, admin user management.
 
