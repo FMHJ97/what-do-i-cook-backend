@@ -1,5 +1,6 @@
 package dev.fmhj97.whatdoicookbackend.service;
 
+import dev.fmhj97.whatdoicookbackend.dto.user.AdminUserResponseDto;
 import dev.fmhj97.whatdoicookbackend.dto.user.ChangePasswordDto;
 import dev.fmhj97.whatdoicookbackend.dto.user.DeleteAccountDto;
 import dev.fmhj97.whatdoicookbackend.dto.user.UserResponseDto;
@@ -7,6 +8,7 @@ import dev.fmhj97.whatdoicookbackend.entity.User;
 import dev.fmhj97.whatdoicookbackend.entity.enums.Role;
 import dev.fmhj97.whatdoicookbackend.exception.InvalidDataException;
 import dev.fmhj97.whatdoicookbackend.exception.ResourceNotFoundException;
+import dev.fmhj97.whatdoicookbackend.repository.RecipeRepository;
 import dev.fmhj97.whatdoicookbackend.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -30,6 +32,9 @@ public class UserServiceTest {
 
     @Mock
     private PasswordEncoder passwordEncoder;
+
+    @Mock
+    private RecipeRepository recipeRepository;
 
     @InjectMocks
     private UserService userService;
@@ -60,45 +65,41 @@ public class UserServiceTest {
     // --- getUsers() ---
 
     @Test
-    void getUsers_ShouldReturnNonAdminUsers_WhenCalled() {
+    void getUsers_ShouldReturnNonAdminUsersWithRecipeCounts_WhenCalled() {
         // Arrange
         when(userRepository.findByRoleNot(Role.ADMIN)).thenReturn(List.of(user1, user2));
+        when(recipeRepository.countRecipesGroupedByOwner()).thenReturn(List.of(
+                new Object[]{1L, 3L},
+                new Object[]{2L, 0L}
+        ));
 
         // Act
-        List<UserResponseDto> result = userService.getUsers();
+        List<AdminUserResponseDto> result = userService.getUsers();
 
         // Assert
         assertThat(result).hasSize(2);
-        assertThat(result).extracting(UserResponseDto::username)
+        assertThat(result).extracting(AdminUserResponseDto::username)
                 .containsExactlyInAnyOrder("david", "sara");
+        assertThat(result).extracting(AdminUserResponseDto::recipeCount)
+                .containsExactlyInAnyOrder(3L, 0L);
 
         // Verify
         verify(userRepository).findByRoleNot(Role.ADMIN);
+        verify(recipeRepository).countRecipesGroupedByOwner();
     }
 
-    // --- getUserById ---
-
     @Test
-    void getUserById_ShouldReturnUser_WhenExists() {
+    void getUsers_ShouldDefaultRecipeCountToZero_WhenUserHasNoRecipes() {
         // Arrange
-        when(userRepository.findById(1L)).thenReturn(Optional.of(user1));
+        when(userRepository.findByRoleNot(Role.ADMIN)).thenReturn(List.of(user1));
+        when(recipeRepository.countRecipesGroupedByOwner()).thenReturn(List.of());
 
         // Act
-        UserResponseDto result = userService.getUserById(1L);
+        List<AdminUserResponseDto> result = userService.getUsers();
 
         // Assert
-        assertThat(result.username()).isEqualTo("david");
-    }
-
-    @Test
-    void getUserById_ShouldThrowResourceNotFoundException_WhenNotExists() {
-        // Arrange
-        when(userRepository.findById(99L)).thenReturn(Optional.empty());
-
-        // Act + Assert
-        assertThatThrownBy(() -> userService.getUserById(99L))
-                .isInstanceOf(ResourceNotFoundException.class)
-                .hasMessageContaining("99");
+        assertThat(result).hasSize(1);
+        assertThat(result.get(0).recipeCount()).isZero();
     }
 
     // --- getProfileInfo() ---

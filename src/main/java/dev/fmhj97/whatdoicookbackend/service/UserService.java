@@ -1,5 +1,6 @@
 package dev.fmhj97.whatdoicookbackend.service;
 
+import dev.fmhj97.whatdoicookbackend.dto.user.AdminUserResponseDto;
 import dev.fmhj97.whatdoicookbackend.dto.user.ChangePasswordDto;
 import dev.fmhj97.whatdoicookbackend.dto.user.DeleteAccountDto;
 import dev.fmhj97.whatdoicookbackend.dto.user.UserResponseDto;
@@ -7,12 +8,15 @@ import dev.fmhj97.whatdoicookbackend.entity.User;
 import dev.fmhj97.whatdoicookbackend.entity.enums.Role;
 import dev.fmhj97.whatdoicookbackend.exception.InvalidDataException;
 import dev.fmhj97.whatdoicookbackend.exception.ResourceNotFoundException;
+import dev.fmhj97.whatdoicookbackend.repository.RecipeRepository;
 import dev.fmhj97.whatdoicookbackend.repository.UserRepository;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Service responsible for user-related operations.
@@ -24,39 +28,38 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final RecipeRepository recipeRepository;
 
     /**
      * Constructor with args.
      * @param userRepository
      * @param passwordEncoder
+     * @param recipeRepository
      */
-    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder, RecipeRepository recipeRepository) {
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.recipeRepository = recipeRepository;
     }
 
     /**
-     * Returns a list of all registered users, excluding admin accounts. Admin only.
+     * Returns a list of all registered users, excluding admin accounts, with their recipe counts. Admin only.
      * @return List of all non-admin users.
      */
     @Transactional(readOnly = true)
-    public List<UserResponseDto> getUsers() {
+    public List<AdminUserResponseDto> getUsers() {
+        Map<Long, Long> recipeCounts = recipeRepository.countRecipesGroupedByOwner().stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0],
+                        row -> (Long) row[1]
+                ));
+
         return userRepository.findByRoleNot(Role.ADMIN).stream()
-                .map(UserResponseDto::from)
+                .map(user -> AdminUserResponseDto.from(
+                        user,
+                        recipeCounts.getOrDefault(user.getId(), 0L)
+                ))
                 .toList();
-    }
-
-    /**
-     * Returns a user by the given ID. Admin only.
-     * @param userId The user ID.
-     * @return The user data.
-     */
-    @Transactional(readOnly = true)
-    public UserResponseDto getUserById(Long userId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
-
-        return UserResponseDto.from(user);
     }
 
     /**

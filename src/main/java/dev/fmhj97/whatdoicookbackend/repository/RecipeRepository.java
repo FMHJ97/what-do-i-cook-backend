@@ -17,6 +17,10 @@ public interface RecipeRepository extends JpaRepository<Recipe, Long> {
 
     List<Recipe> findByOwnerId(Long ownerId);
 
+    // Counts recipes grouped by owner id, used to populate admin recipe counts in a single query.
+    @Query("SELECT r.owner.id, COUNT(r) FROM Recipe r GROUP BY r.owner.id")
+    List<Object[]> countRecipesGroupedByOwner();
+
     List<Recipe> findByOwnerIdAndTitleContainingIgnoreCase(Long ownerId, String title);
 
     List<Recipe> findByOwnerIdAndFoodType(Long ownerId, FoodType foodType);

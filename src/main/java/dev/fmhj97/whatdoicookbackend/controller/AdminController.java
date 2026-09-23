@@ -1,6 +1,6 @@
 package dev.fmhj97.whatdoicookbackend.controller;
 
-import dev.fmhj97.whatdoicookbackend.dto.user.UserResponseDto;
+import dev.fmhj97.whatdoicookbackend.dto.user.AdminUserResponseDto;
 import dev.fmhj97.whatdoicookbackend.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -27,29 +27,14 @@ public class AdminController {
     }
 
     /**
-     * Returns a list of all registered users, excluding admin accounts.
+     * Returns a list of all registered users, excluding admin accounts, including their recipe counts.
      * @return A response containing the list of all non-admin users.
      */
     @GetMapping("/users")
     @Operation(summary = "Returns a list of all registered users, excluding admin accounts")
-    public ResponseEntity<List<UserResponseDto>> getUsers() {
+    public ResponseEntity<List<AdminUserResponseDto>> getUsers() {
         return ResponseEntity.ok(
                 userService.getUsers()
-        );
-    }
-
-    /**
-     * Returns a user by the given ID.
-     * @param id The ID of the user.
-     * @return The user's data.
-     */
-    @GetMapping("/users/{id}")
-    @Operation(summary = "Returns a user by the given ID")
-    public ResponseEntity<UserResponseDto> getUserById(
-            @PathVariable Long id
-    ) {
-        return ResponseEntity.ok(
-                userService.getUserById(id)
         );
     }
 
