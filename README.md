@@ -8,9 +8,7 @@ This project was built as a personal project to learn and practice Spring Boot, 
 
 ## 🌐 Live Demo
 
-- **Full App:** https://what-do-i-cook-frontend.onrender.com
-- **API Base URL:** https://what-do-i-cook-backend.onrender.com
-- **Swagger UI:** https://what-do-i-cook-backend.onrender.com/swagger-ui/index.html
+- **URL:** https://what-do-i-cook-frontend.onrender.com
 
 > The service runs on Render's free tier. If it hasn't received any requests in the last 15 minutes, the first request may take around 30 seconds to respond.
 
