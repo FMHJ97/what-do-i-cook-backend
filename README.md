@@ -11,13 +11,14 @@ This project was built as a personal project to learn and practice Spring Boot, 
 - **URL:** https://what-do-i-cook-frontend.onrender.com
 
 > The service runs on Render's free tier. If it hasn't received any requests in the last 15 minutes, the first request may take around 30 seconds to respond.
-> To avoid that, an UpTimeRobot monitor pings the frontend periodically to keep it awake.
+> To avoid that, UpTimeRobot monitor pings the backend (`GET /api/ping`) periodically to keep them awake.
 
 ---
 
 ## ✨ Features
 
 ### Users
+
 - Register and log in with JWT authentication.
 - Full CRUD for their own recipes (title, description, food type, servings, prep/cook time).
 - Add ingredients and steps to each recipe.
@@ -27,6 +28,7 @@ This project was built as a personal project to learn and practice Spring Boot, 
 - View their own profile info.
 
 ### Admins
+
 - Full CRUD for the ingredient catalog.
 - View and delete user accounts.
 - No access to user recipes — full privacy.
@@ -35,17 +37,17 @@ This project was built as a personal project to learn and practice Spring Boot, 
 
 ## 🛠 Tech Stack
 
-| Layer | Technology |
-|---|---|
-| Language | Java 21 |
-| Framework | Spring Boot 4.0.6 |
-| Security | Spring Security + JWT (jjwt 0.13.0) |
-| Persistence | Spring Data JPA + Hibernate 7 |
-| Database | PostgreSQL |
-| Documentation | SpringDoc OpenAPI (Swagger UI) |
-| Build | Maven |
-| Containerization | Docker + Docker Compose |
-| Testing | JUnit 5 + Mockito |
+| Layer            | Technology                          |
+| ---------------- | ----------------------------------- |
+| Language         | Java 21                             |
+| Framework        | Spring Boot 4.0.6                   |
+| Security         | Spring Security + JWT (jjwt 0.13.0) |
+| Persistence      | Spring Data JPA + Hibernate 7       |
+| Database         | PostgreSQL                          |
+| Documentation    | SpringDoc OpenAPI (Swagger UI)      |
+| Build            | Maven                               |
+| Containerization | Docker + Docker Compose             |
+| Testing          | JUnit 5 + Mockito                   |
 
 ---
 
@@ -66,26 +68,27 @@ Controller → Service → Repository → Database
 
 ## 🗂 Main Endpoints
 
-| Method | Endpoint | Description | Role |
-|---|---|---|---|
-| POST | `/api/auth/register` | Register a new user | Public |
-| POST | `/api/auth/login` | Log in and get a JWT token | Public |
-| GET | `/api/recipes` | List your recipes (filterable) | USER |
-| GET | `/api/recipes/{id}/details` | Full recipe details with ingredients and steps | USER |
-| GET | `/api/recipes/random` | Get a random recipe | USER |
-| GET | `/api/recipes/filter` | Filter recipes by ingredients you have | USER |
-| POST | `/api/recipes` | Create a recipe | USER |
-| PATCH | `/api/recipes/{id}` | Update a recipe | USER |
-| DELETE | `/api/recipes/{id}` | Delete a recipe | USER |
-| GET/POST/PATCH/DELETE | `/api/recipes/{id}/steps` | Manage recipe steps | USER |
-| GET/POST/PATCH/DELETE | `/api/recipes/{id}/ingredients` | Manage recipe ingredients | USER |
-| GET | `/api/ingredients` | Browse ingredient catalog | USER + ADMIN |
-| POST/PATCH/DELETE | `/api/ingredients` | Manage ingredient catalog | ADMIN |
-| GET | `/api/profile` | View your own profile | USER + ADMIN |
-| PATCH | `/api/profile/password` | Change your own password | USER |
-| DELETE | `/api/profile` | Delete your own account | USER |
-| GET | `/api/admin/users` | List all users (excluding admins) | ADMIN |
-| DELETE | `/api/admin/users/{id}` | Delete a user by ID | ADMIN |
+| Method                | Endpoint                        | Description                                    | Role         |
+| --------------------- | ------------------------------- | ---------------------------------------------- | ------------ |
+| POST                  | `/api/auth/register`            | Register a new user                            | Public       |
+| POST                  | `/api/auth/login`               | Log in and get a JWT token                     | Public       |
+| GET                   | `/api/ping`                     | Liveness check for uptime monitors             | Public       |
+| GET                   | `/api/recipes`                  | List your recipes (filterable)                 | USER         |
+| GET                   | `/api/recipes/{id}/details`     | Full recipe details with ingredients and steps | USER         |
+| GET                   | `/api/recipes/random`           | Get a random recipe                            | USER         |
+| GET                   | `/api/recipes/filter`           | Filter recipes by ingredients you have         | USER         |
+| POST                  | `/api/recipes`                  | Create a recipe                                | USER         |
+| PATCH                 | `/api/recipes/{id}`             | Update a recipe                                | USER         |
+| DELETE                | `/api/recipes/{id}`             | Delete a recipe                                | USER         |
+| GET/POST/PATCH/DELETE | `/api/recipes/{id}/steps`       | Manage recipe steps                            | USER         |
+| GET/POST/PATCH/DELETE | `/api/recipes/{id}/ingredients` | Manage recipe ingredients                      | USER         |
+| GET                   | `/api/ingredients`              | Browse ingredient catalog                      | USER + ADMIN |
+| POST/PATCH/DELETE     | `/api/ingredients`              | Manage ingredient catalog                      | ADMIN        |
+| GET                   | `/api/profile`                  | View your own profile                          | USER + ADMIN |
+| PATCH                 | `/api/profile/password`         | Change your own password                       | USER         |
+| DELETE                | `/api/profile`                  | Delete your own account                        | USER         |
+| GET                   | `/api/admin/users`              | List all users (excluding admins)              | ADMIN        |
+| DELETE                | `/api/admin/users/{id}`         | Delete a user by ID                            | ADMIN        |
 
 Full API documentation available at `/swagger-ui/index.html`.
 
@@ -96,12 +99,14 @@ Full API documentation available at `/swagger-ui/index.html`.
 ### Option A — Maven (requires Java 21+ and PostgreSQL)
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/FMHJ97/what-do-i-cook-backend.git
    cd what-do-i-cook-backend
    ```
 
 2. Create a PostgreSQL database:
+
    ```sql
    CREATE DATABASE "what_do_i_cook";
    ```
@@ -120,6 +125,7 @@ Full API documentation available at `/swagger-ui/index.html`.
    ```
 
 4. Run the application:
+
    ```bash
    mvn spring-boot:run
    ```
@@ -131,6 +137,7 @@ Full API documentation available at `/swagger-ui/index.html`.
 ### Option B — Docker Compose (Docker Desktop required)
 
 1. Clone the repository:
+
    ```bash
    git clone https://github.com/FMHJ97/what-do-i-cook-backend.git
    cd what-do-i-cook-backend
@@ -150,6 +157,7 @@ Full API documentation available at `/swagger-ui/index.html`.
    ```
 
 3. Start the app and database together:
+
    ```bash
    docker-compose up --build
    ```
