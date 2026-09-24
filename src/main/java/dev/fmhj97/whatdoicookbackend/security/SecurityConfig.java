@@ -102,7 +102,8 @@ public class SecurityConfig {
                             ).denyAll();
                         }
                         auth.requestMatchers(
-                                "/api/auth/**"
+                                "/api/auth/**",
+                                "/api/ping"
                         ).permitAll();
                         // Ingredient Endpoints
                         auth.requestMatchers(HttpMethod.GET, "/api/ingredients/**").authenticated();
